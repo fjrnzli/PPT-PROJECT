@@ -12,7 +12,7 @@ import ConcentricRings from '../components/ConcentricRings';
  */
 
 const checkItems = [
-  'Seluruh alur diuji dengan data contoh',
+  'Seluruh alur sudah diuji dengan data asli',
   'Formulir, otomasi email, dan pengecekan status berfungsi penuh',
   'QR code terpasang fisik dan siap digunakan',
 ];
@@ -31,8 +31,8 @@ export default function Section4Proof() {
         pointerEvents: 'none',
       }} />
 
-      <ConcentricRings 
-        customStyle={{ top: '50%', left: '25%', transform: 'translate(-50%, -50%)' }} 
+      <ConcentricRings
+        customStyle={{ top: '50%', left: '25%', transform: 'translate(-50%, -50%)' }}
       />
 
       <div ref={sectionRef} style={{

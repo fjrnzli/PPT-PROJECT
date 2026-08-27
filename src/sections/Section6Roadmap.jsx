@@ -120,31 +120,46 @@ export default function Section6Roadmap() {
               }}
             >
               {/* Step Card */}
-              <div style={{
-                background: '#F8F8F8',
-                borderRadius: '16px',
-                padding: '28px 24px',
-                width: '260px',
-                textAlign: 'center',
-                position: 'relative',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-              }}>
+              <motion.div
+                whileHover={{
+                  y: -6,
+                  boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
+                  transition: { duration: 0.25 },
+                }}
+                style={{
+                  background: '#F8F8F8',
+                  borderRadius: '16px',
+                  padding: '28px 24px',
+                  width: '260px',
+                  textAlign: 'center',
+                  position: 'relative',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                  cursor: 'default',
+                  transition: 'box-shadow 0.3s ease',
+                }}
+              >
                 {/* Step Number Circle */}
-                <div style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  background: step.status === 'future' ? '#E0E0E0' : '#8B1A1A',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 16px',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                }}>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={isInView ? { scale: 1 } : {}}
+                  transition={{ delay: 0.5 + index * 0.15, type: 'spring', stiffness: 250, damping: 15 }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: step.status === 'future' ? '#E0E0E0' : '#8B1A1A',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    boxShadow: step.status !== 'future' ? '0 4px 14px rgba(139,26,26,0.25)' : 'none',
+                  }}
+                >
                   {index + 1}
-                </div>
+                </motion.div>
 
                 {/* Icon */}
                 <div style={{
@@ -179,17 +194,76 @@ export default function Section6Roadmap() {
                 }}>
                   {step.description}
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Connector Arrow */}
+              {/* Animated Connector Arrow */}
               {index < ROADMAP_STEPS.length - 1 && (
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   paddingTop: '56px',
-                  margin: '0 8px',
+                  margin: '0 4px',
+                  width: '48px',
                 }}>
-                  <ArrowRight size={24} color="#D0D0D0" />
+                  <svg width="48" height="28" viewBox="0 0 48 28" fill="none" style={{ overflow: 'visible' }}>
+                    {/* Soft glow track */}
+                    <motion.path
+                      d="M4 14 Q24 14 44 14"
+                      stroke="rgba(139,26,26,0.06)"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                      fill="none"
+                      initial={{ opacity: 0 }}
+                      animate={isInView ? { opacity: 1 } : {}}
+                      transition={{ duration: 0.5, delay: 0.5 + index * 0.2 }}
+                    />
+                    {/* Main line */}
+                    <motion.path
+                      d="M4 14 Q24 14 44 14"
+                      stroke="url(#roadmapGrad)"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      fill="none"
+                      initial={{ pathLength: 0 }}
+                      animate={isInView ? { pathLength: 1 } : {}}
+                      transition={{ duration: 0.8, delay: 0.6 + index * 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    />
+                    {/* Arrow tip */}
+                    <motion.path
+                      d="M38 8 L48 14 L38 20"
+                      stroke="#D0D0D0"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      initial={{ opacity: 0, pathLength: 0 }}
+                      animate={isInView ? { opacity: 1, pathLength: 1 } : {}}
+                      transition={{ duration: 0.3, delay: 1 + index * 0.2 }}
+                    />
+                    {/* Traveling dot */}
+                    <motion.circle
+                      r="2.5" cy="14" fill="#8B1A1A"
+                      initial={{ opacity: 0 }}
+                      animate={isInView ? {
+                        cx: [4, 44],
+                        opacity: [0, 0.8, 0.8, 0],
+                      } : {}}
+                      transition={{
+                        duration: 1.4,
+                        delay: 1.2 + index * 0.3,
+                        repeat: Infinity,
+                        repeatDelay: 3,
+                        ease: [0.4, 0, 0.6, 1],
+                      }}
+                    />
+                    <defs>
+                      <linearGradient id="roadmapGrad" x1="4" y1="14" x2="44" y2="14" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#D0D0D0" stopOpacity="0.3" />
+                        <stop offset="0.5" stopColor="#D0D0D0" />
+                        <stop offset="1" stopColor="#8B1A1A" stopOpacity="0.4" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
                 </div>
               )}
             </motion.div>

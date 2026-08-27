@@ -62,10 +62,11 @@ const WORKFLOW_STEPS = [
   },
 ];
 
-/* ─── Animated SVG connector between steps ─── */
+/* ─── Animated SVG connector between steps (curved, organic) ─── */
 function ConnectorLine({ direction = 'right', delay = 0, isActive }) {
   const isDown = direction === 'down';
   const isLeft = direction === 'left';
+  const uniqueId = `${direction}-${delay}`;
 
   if (isDown) {
     return (
@@ -76,80 +77,103 @@ function ConnectorLine({ direction = 'right', delay = 0, isActive }) {
         height: '56px',
         position: 'relative',
       }}>
-        <svg width="28" height="56" viewBox="0 0 28 56" fill="none" style={{ overflow: 'visible' }}>
-          {/* Dashed track */}
-          <motion.line
-            x1="14" y1="0" x2="14" y2="48"
-            stroke="rgba(139,26,26,0.15)"
-            strokeWidth="2"
-            strokeDasharray="4 4"
+        <svg width="40" height="56" viewBox="0 0 40 56" fill="none" style={{ overflow: 'visible' }}>
+          {/* Soft glow track */}
+          <motion.path
+            d="M20 2 Q20 28 20 50"
+            stroke="rgba(139,26,26,0.08)"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
-            transition={{ duration: 0.4, delay }}
+            transition={{ duration: 0.6, delay }}
           />
-          {/* Animated solid line drawing in */}
-          <motion.line
-            x1="14" y1="0" x2="14" y2="48"
-            stroke="url(#gradDown)"
-            strokeWidth="2.5"
+          {/* Main curved path */}
+          <motion.path
+            d="M20 2 Q20 28 20 50"
+            stroke={`url(#gradDown-${uniqueId})`}
+            strokeWidth="2"
             strokeLinecap="round"
+            fill="none"
             initial={{ pathLength: 0 }}
             animate={isActive ? { pathLength: 1 } : {}}
-            transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+            transition={{ duration: 1, delay, ease: [0.4, 0, 0.2, 1] }}
           />
-          {/* Arrow head */}
-          <motion.polygon
-            points="8,44 14,54 20,44"
-            fill="#A61C1C"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.3, delay: delay + 0.7, type: 'spring', stiffness: 300 }}
-            style={{ transformOrigin: '14px 49px' }}
-          />
-          {/* Glowing traveling dot */}
-          <motion.circle
-            r="4" fill="#8B1A1A"
-            initial={{ cx: 14, cy: 0, opacity: 0 }}
-            animate={isActive ? {
-              cy: [0, 48],
-              opacity: [0, 1, 1, 0],
-            } : {}}
+          {/* Dashed overlay for texture */}
+          <motion.path
+            d="M20 2 Q20 28 20 50"
+            stroke="rgba(139,26,26,0.12)"
+            strokeWidth="1"
+            strokeDasharray="3 6"
+            strokeLinecap="round"
+            fill="none"
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1, strokeDashoffset: [0, -18] } : {}}
             transition={{
-              duration: 1.2,
-              delay: delay + 1,
-              repeat: Infinity,
-              repeatDelay: 2.5,
-              ease: 'easeInOut',
+              opacity: { duration: 0.4, delay },
+              strokeDashoffset: { duration: 2, delay: delay + 0.5, repeat: Infinity, ease: 'linear' },
             }}
           />
+          {/* Smooth arrow tip */}
+          <motion.path
+            d="M14 44 L20 54 L26 44"
+            stroke={`url(#gradDown-${uniqueId})`}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            initial={{ opacity: 0, pathLength: 0 }}
+            animate={isActive ? { opacity: 1, pathLength: 1 } : {}}
+            transition={{ duration: 0.4, delay: delay + 0.8, ease: 'easeOut' }}
+          />
+          {/* Traveling particle */}
           <motion.circle
-            r="8" fill="none" stroke="rgba(139,26,26,0.3)"
-            initial={{ cx: 14, cy: 0, opacity: 0 }}
+            r="3" fill="#8B1A1A"
+            filter={`url(#glow-${uniqueId})`}
+            initial={{ opacity: 0 }}
             animate={isActive ? {
-              cy: [0, 48],
-              opacity: [0, 0.4, 0.4, 0],
-              r: [4, 10, 4],
+              opacity: [0, 0.9, 0.9, 0],
+              cy: [2, 50],
+              cx: [20, 20],
             } : {}}
             transition={{
-              duration: 1.2,
-              delay: delay + 1,
+              duration: 1.4,
+              delay: delay + 1.2,
               repeat: Infinity,
-              repeatDelay: 2.5,
-              ease: 'easeInOut',
+              repeatDelay: 2.8,
+              ease: [0.4, 0, 0.6, 1],
             }}
           />
           <defs>
-            <linearGradient id="gradDown" x1="14" y1="0" x2="14" y2="48" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#8B1A1A" />
+            <linearGradient id={`gradDown-${uniqueId}`} x1="20" y1="0" x2="20" y2="56" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#8B1A1A" stopOpacity="0.3" />
+              <stop offset="0.5" stopColor="#8B1A1A" />
               <stop offset="1" stopColor="#D4442A" />
             </linearGradient>
+            <filter id={`glow-${uniqueId}`}>
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
         </svg>
       </div>
     );
   }
 
-  const gradId = isLeft ? 'gradLeft' : 'gradRight';
+  /* Horizontal connector (right or left) with gentle S-curve */
+  const pathD = isLeft
+    ? 'M54 14 Q40 14 30 14 Q20 14 6 14'
+    : 'M6 14 Q20 14 30 14 Q40 14 54 14';
+  const arrowD = isLeft
+    ? 'M12 8 L2 14 L12 20'
+    : 'M48 8 L58 14 L48 20';
+  const startX = isLeft ? 54 : 6;
+  const endX = isLeft ? 6 : 54;
+
   return (
     <div style={{
       display: 'flex',
@@ -161,72 +185,88 @@ function ConnectorLine({ direction = 'right', delay = 0, isActive }) {
       position: 'relative',
     }}>
       <svg width="60" height="28" viewBox="0 0 60 28" fill="none" style={{ overflow: 'visible' }}>
-        {/* Dashed track */}
-        <motion.line
-          x1={isLeft ? 54 : 6} y1="14" x2={isLeft ? 6 : 54} y2="14"
-          stroke="rgba(139,26,26,0.15)"
-          strokeWidth="2"
-          strokeDasharray="4 4"
+        {/* Soft glow track */}
+        <motion.path
+          d={pathD}
+          stroke="rgba(139,26,26,0.06)"
+          strokeWidth="10"
+          strokeLinecap="round"
+          fill="none"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ duration: 0.4, delay }}
+          transition={{ duration: 0.6, delay }}
         />
-        {/* Animated solid line */}
-        <motion.line
-          x1={isLeft ? 54 : 6} y1="14" x2={isLeft ? 6 : 54} y2="14"
-          stroke={`url(#${gradId})`}
-          strokeWidth="2.5"
+        {/* Main path */}
+        <motion.path
+          d={pathD}
+          stroke={`url(#gradH-${uniqueId})`}
+          strokeWidth="2"
           strokeLinecap="round"
+          fill="none"
           initial={{ pathLength: 0 }}
           animate={isActive ? { pathLength: 1 } : {}}
-          transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+          transition={{ duration: 1, delay, ease: [0.4, 0, 0.2, 1] }}
         />
-        {/* Arrow head */}
-        <motion.polygon
-          points={isLeft ? '10,8 0,14 10,20' : '50,8 60,14 50,20'}
-          fill="#A61C1C"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.3, delay: delay + 0.7, type: 'spring', stiffness: 300 }}
-          style={{ transformOrigin: isLeft ? '5px 14px' : '55px 14px' }}
-        />
-        {/* Glowing traveling dot */}
-        <motion.circle
-          r="4" cy="14" fill="#8B1A1A"
-          initial={{ cx: isLeft ? 54 : 6, opacity: 0 }}
+        {/* Dashed overlay for texture */}
+        <motion.path
+          d={pathD}
+          stroke="rgba(139,26,26,0.12)"
+          strokeWidth="1"
+          strokeDasharray="3 6"
+          strokeLinecap="round"
+          fill="none"
+          initial={{ opacity: 0 }}
           animate={isActive ? {
-            cx: isLeft ? [54, 6] : [6, 54],
-            opacity: [0, 1, 1, 0],
+            opacity: 1,
+            strokeDashoffset: isLeft ? [0, 18] : [0, -18],
           } : {}}
           transition={{
-            duration: 1.2,
-            delay: delay + 1,
-            repeat: Infinity,
-            repeatDelay: 2.5,
-            ease: 'easeInOut',
+            opacity: { duration: 0.4, delay },
+            strokeDashoffset: { duration: 2, delay: delay + 0.5, repeat: Infinity, ease: 'linear' },
           }}
         />
-        {/* Glow ring around dot */}
+        {/* Smooth arrow tip */}
+        <motion.path
+          d={arrowD}
+          stroke={`url(#gradH-${uniqueId})`}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          initial={{ opacity: 0, pathLength: 0 }}
+          animate={isActive ? { opacity: 1, pathLength: 1 } : {}}
+          transition={{ duration: 0.4, delay: delay + 0.8, ease: 'easeOut' }}
+        />
+        {/* Traveling particle */}
         <motion.circle
-          r="8" cy="14" fill="none" stroke="rgba(139,26,26,0.3)"
-          initial={{ cx: isLeft ? 54 : 6, opacity: 0 }}
+          r="3" cy="14" fill="#8B1A1A"
+          filter={`url(#glow-${uniqueId})`}
+          initial={{ opacity: 0 }}
           animate={isActive ? {
-            cx: isLeft ? [54, 6] : [6, 54],
-            opacity: [0, 0.4, 0.4, 0],
+            cx: [startX, endX],
+            opacity: [0, 0.9, 0.9, 0],
           } : {}}
           transition={{
-            duration: 1.2,
-            delay: delay + 1,
+            duration: 1.4,
+            delay: delay + 1.2,
             repeat: Infinity,
-            repeatDelay: 2.5,
-            ease: 'easeInOut',
+            repeatDelay: 2.8,
+            ease: [0.4, 0, 0.6, 1],
           }}
         />
         <defs>
-          <linearGradient id={gradId} x1={isLeft ? '54' : '6'} y1="14" x2={isLeft ? '6' : '54'} y2="14" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#8B1A1A" />
+          <linearGradient id={`gradH-${uniqueId}`} x1={String(startX)} y1="14" x2={String(endX)} y2="14" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#8B1A1A" stopOpacity="0.3" />
+            <stop offset="0.5" stopColor="#8B1A1A" />
             <stop offset="1" stopColor="#D4442A" />
           </linearGradient>
+          <filter id={`glow-${uniqueId}`}>
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
       </svg>
     </div>

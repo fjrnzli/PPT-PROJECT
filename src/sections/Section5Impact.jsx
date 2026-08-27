@@ -266,6 +266,23 @@ export default function Section5Impact() {
                 }}
               />
 
+              {/* Shimmer sweep */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={isInView ? { x: '200%' } : {}}
+                transition={{ duration: 1.2, delay: 1.2 + index * 0.15, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '50%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                  pointerEvents: 'none',
+                  zIndex: 3,
+                }}
+              />
+
               {/* Big Number */}
               <div style={{
                 fontSize: 'clamp(1.8rem, 2.5vw, 2.4rem)',
