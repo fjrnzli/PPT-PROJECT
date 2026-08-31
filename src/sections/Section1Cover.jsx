@@ -111,9 +111,9 @@ export default function Section1Cover() {
       />
 
       <FloatingShapes />
-      <ConcentricRings 
-        color="rgba(255, 255, 255, 0.4)" 
-        customStyle={{ top: '0', left: 'auto', right: '0', transform: 'translate(40%, -30%) scale(1.2)' }} 
+      <ConcentricRings
+        color="rgba(255, 255, 255, 0.4)"
+        customStyle={{ top: '0', left: 'auto', right: '0', transform: 'translate(40%, -30%) scale(1.2)' }}
       />
 
       {/* Radial glow behind content */}
@@ -226,7 +226,7 @@ export default function Section1Cover() {
             background: 'rgba(255,255,255,0.06)',
             borderRadius: '20px',
           }}>
-            Peserta Magang di OJK Kalimantan Selatan
+            Project Akhir
           </span>
         </motion.div>
       </motion.div>
